@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentCollaboration.API", "DocumentCollaboration.API\DocumentCollaboration.API.csproj", "{4FD67F1C-FA78-4B3E-A772-06062B5E643A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentCollaboration.Application", "DocumentCollaboration.Application\DocumentCollaboration.Application.csproj", "{C54F565D-21FE-49FB-BFE0-B0D598CE3DCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentCollaboration.Domain", "DocumentCollaboration.Domain\DocumentCollaboration.Domain.csproj", "{EBD5FEBC-4734-47EC-9A27-A574D9CA75DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentCollaboration.Infrastructure", "DocumentCollaboration.Infrastructure\DocumentCollaboration.Infrastructure.csproj", "{2CB2A6C2-586D-4951-8C43-D84E75BBE990}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentCollaboration.Tests", "DocumentCollaboration.Tests\DocumentCollaboration.Tests.csproj", "{827A6639-B298-4EE3-BE31-5C62E35F0756}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4FD67F1C-FA78-4B3E-A772-06062B5E643A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FD67F1C-FA78-4B3E-A772-06062B5E643A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FD67F1C-FA78-4B3E-A772-06062B5E643A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FD67F1C-FA78-4B3E-A772-06062B5E643A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C54F565D-21FE-49FB-BFE0-B0D598CE3DCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C54F565D-21FE-49FB-BFE0-B0D598CE3DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C54F565D-21FE-49FB-BFE0-B0D598CE3DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C54F565D-21FE-49FB-BFE0-B0D598CE3DCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBD5FEBC-4734-47EC-9A27-A574D9CA75DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBD5FEBC-4734-47EC-9A27-A574D9CA75DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBD5FEBC-4734-47EC-9A27-A574D9CA75DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBD5FEBC-4734-47EC-9A27-A574D9CA75DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CB2A6C2-586D-4951-8C43-D84E75BBE990}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CB2A6C2-586D-4951-8C43-D84E75BBE990}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CB2A6C2-586D-4951-8C43-D84E75BBE990}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CB2A6C2-586D-4951-8C43-D84E75BBE990}.Release|Any CPU.Build.0 = Release|Any CPU
+		{827A6639-B298-4EE3-BE31-5C62E35F0756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{827A6639-B298-4EE3-BE31-5C62E35F0756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{827A6639-B298-4EE3-BE31-5C62E35F0756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{827A6639-B298-4EE3-BE31-5C62E35F0756}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

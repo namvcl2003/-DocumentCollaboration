@@ -1,28 +1,3 @@
-// var builder = WebApplication.CreateBuilder(args);
-//
-// // Add services to the container.
-//
-// builder.Services.AddControllers();
-// // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
-//
-// var app = builder.Build();
-//
-// // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
-//
-// app.UseHttpsRedirection();
-//
-// app.UseAuthorization();
-//
-// app.MapControllers();
-//
-// app.Run();
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +7,7 @@ using DocumentCollaboration.Application.Services;
 using DocumentCollaboration.Domain.Interfaces;
 using DocumentCollaboration.Infrastructure.Data;
 using DocumentCollaboration.Infrastructure.Repositories;
+using DocumentCollaboration.Infrastructure.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,10 +39,12 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // ===== APPLICATION SERVICES =====
 builder.Services.AddScoped<IAuthService, AuthService>();
-// Add more services here as you implement them
-// builder.Services.AddScoped<IDocumentService, DocumentService>();
-// builder.Services.AddScoped<IWorkflowService, WorkflowService>();
-// builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IDocumentNumberGenerator, DocumentNumberGenerator>();
 
 // ===== JWT AUTHENTICATION =====
 var jwtSecret = builder.Configuration["Jwt:Secret"] 
@@ -90,7 +68,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-        ClockSkew = TimeSpan.Zero // Remove default 5 minute buffer
+        ClockSkew = TimeSpan.Zero
     };
 
     options.Events = new JwtBearerEvents
@@ -123,7 +101,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:3000",
                 "http://localhost:3001",
-                "http://localhost:5173" // Vite default port
+                "http://localhost:5173"
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -135,7 +113,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = null; // Keep PascalCase
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
@@ -147,7 +125,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Document Collaboration API",
         Version = "v1",
-        Description = "API for Document Collaboration System with Workflow Management",
+        Description = "API for Document Collaboration System with 3-Level Workflow Management",
         Contact = new OpenApiContact
         {
             Name = "Support Team",
@@ -155,7 +133,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // Add JWT Authentication to Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -179,12 +156,6 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-
-    // Include XML comments if available
-    // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    // if (File.Exists(xmlPath))
-    //     options.IncludeXmlComments(xmlPath);
 });
 
 // ===== HTTP CONTEXT ACCESSOR =====
@@ -201,20 +172,18 @@ var app = builder.Build();
 
 // ===== MIDDLEWARE PIPELINE =====
 
-// Development-specific middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Document Collaboration API v1");
-        options.RoutePrefix = string.Empty; // Swagger UI at root
+        options.RoutePrefix = string.Empty;
     });
     app.UseDeveloperExceptionPage();
 }
 else
 {
-    // Production error handling
     app.UseExceptionHandler("/error");
     app.UseHsts();
 }
@@ -236,10 +205,10 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// CORS - must be before Authentication/Authorization
+// CORS
 app.UseCors("AllowReactApp");
 
-// Static files (for document downloads if needed)
+// Static files
 app.UseStaticFiles();
 
 // Authentication & Authorization
@@ -249,10 +218,10 @@ app.UseAuthorization();
 // Controllers
 app.MapControllers();
 
-// Health check endpoint
+// Health check
 app.MapHealthChecks("/health");
 
-// Global error handler endpoint
+// Error handler
 app.MapGet("/error", () => Results.Problem("An error occurred while processing your request."))
     .ExcludeFromDescription();
 
@@ -260,13 +229,23 @@ app.MapGet("/error", () => Results.Problem("An error occurred while processing y
 app.MapGet("/", () => new
 {
     ApplicationName = "Document Collaboration API",
-    Version = "1.0",
+    Version = "1.0.0",
     Status = "Running",
     Timestamp = DateTime.UtcNow,
-    SwaggerUrl = "/swagger"
+    SwaggerUrl = "/swagger",
+    Features = new[]
+    {
+        "3-Level Workflow (Assistant → Vice Manager → Manager)",
+        "JWT Authentication & Authorization",
+        "Document Version Control",
+        "Comment System",
+        "Notification System",
+        "Audit Logging",
+        "File Storage Management"
+    }
 }).ExcludeFromDescription();
 
-// ===== DATABASE MIGRATION (Development only) =====
+// ===== DATABASE CONNECTION TEST =====
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
@@ -274,34 +253,44 @@ if (app.Environment.IsDevelopment())
     
     try
     {
-        // Check if database exists and is accessible
         if (dbContext.Database.CanConnect())
         {
-            Log.Information("Database connection successful");
-            // Uncomment to apply pending migrations automatically
-            // await dbContext.Database.MigrateAsync();
+            Log.Information("✅ Database connection successful");
+            
+            // Check if we have data
+            var userCount = dbContext.Users.Count();
+            var roleCount = dbContext.Roles.Count();
+            var deptCount = dbContext.Departments.Count();
+            
+            Log.Information($"📊 Database statistics: {userCount} users, {roleCount} roles, {deptCount} departments");
+            
+            if (userCount == 0)
+            {
+                Log.Warning("⚠️  No users found in database. Please run SeedData.sql");
+            }
         }
         else
         {
-            Log.Warning("Cannot connect to database. Please check connection string.");
+            Log.Warning("❌ Cannot connect to database. Please check connection string.");
         }
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "An error occurred while connecting to the database");
+        Log.Error(ex, "❌ Error connecting to database");
     }
 }
 
-Log.Information("Starting Document Collaboration API");
+Log.Information("🚀 Starting Document Collaboration API");
+Log.Information("📝 Swagger UI available at: {SwaggerUrl}", app.Environment.IsDevelopment() ? "http://localhost:5057/swagger" : "/swagger");
 
 try
 {
     app.Run();
-    Log.Information("Application started successfully");
+    Log.Information("✅ Application started successfully");
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Application terminated unexpectedly");
+    Log.Fatal(ex, "❌ Application terminated unexpectedly");
 }
 finally
 {

@@ -2,7 +2,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DocumentCollaboration.Domain\DocumentCollaboration.Domain.csproj" />
+    <ProjectReference Include="..\DocumentCollaboration.Infrastructure\DocumentCollaboration.Infrastructure.csproj" />
   </ItemGroup>
+  <!-- THÊM vào ItemGroup -->
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.1.0" />

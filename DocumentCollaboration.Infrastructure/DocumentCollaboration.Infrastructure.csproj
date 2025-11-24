@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DocumentCollaboration.Domain\DocumentCollaboration.Domain.csproj" />
-    <ProjectReference Include="..\DocumentCollaboration.Application\DocumentCollaboration.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
